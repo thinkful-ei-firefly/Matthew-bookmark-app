@@ -1,0 +1,22 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-size: 1.6rem;
+}
+
+.header {
+  height: 4rem;
+  width: 100%;
+  font-size: 3rem;
+  font-weight: bold;
+  color: white;
+  background: black;
+}
