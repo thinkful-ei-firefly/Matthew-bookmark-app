@@ -15,6 +15,10 @@ const store = (function() {
     const bookmark = this.bookmarks.find(bookmark => bookmark.id === id);
     bookmark.extended = !bookmark.extended;
   }
+  function toggleAdding() {
+    this.adding = !this.adding;
+  }
+  const error = null;
   const adding = false;
   minRatingFilter = null;
   return {
@@ -23,6 +27,8 @@ const store = (function() {
     deleteBookmark,
     adding,
     minRatingFilter,
-    extendBookmark
+    extendBookmark,
+    error,
+    toggleAdding
   };
 })();

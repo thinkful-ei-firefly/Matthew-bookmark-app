@@ -1,34 +1,54 @@
 const bookmarkUtils = (function() {
   function renderForm() {
-    console.log("working");
     const form = `<form class="form" name="form">
-          <label for="title">Bookmark Title</label>
-          <input required name="title" id="title" type="text" />
-          <label for="url">Bookmark Url</label>
-          <input required name="url" id="url" type="text" />
-          <label for="desc">Bookmark Description</label>
-          <textarea name="desc" id="desc" id="" cols="30" rows="10"></textarea>
-          <label for="rating">Bookmark Rating</label>
-          <select id="rating" name="rating">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-          </select>
-          <input type="submit" class=".submit" value="Submit New Bookmark" />
-        </form>`;
-    console.log(store.adding);
+    <div class="input-group">
+      <label for="title">Bookmark Title</label>
+      <input required name="title" id="title" class="text-input" type="text" placeholder="My Fav Website..." />
+    </div>
+    <div class="input-group">
+      <label for="url">Bookmark Url</label>
+      <input required name="url" id="url" class="text-input" type="url" placeholder="https://www.myfavwebsite.com" />
+    </div>
+    <div class="input-group">
+      <label for="desc">Bookmark Description</label>
+      <textarea  placeholder="..." class="text-input" name="desc" id="desc" id="" cols="30" rows="10"></textarea>
+    </div>
+    <div class="input-group">
+      <label for="rating">Bookmark Rating</label>
+      <select id="rating" name="rating">
+        <option value="1">1 star</option>
+        <option value="2">2 star</option>
+        <option value="3">3 star</option>
+        <option value="4">4 star</option>
+        <option value="5">5 star</option>
+      </select>
+    </div>
+
+    <div class="input-group buttons">
+      <input type="submit" class="button" value="Submit New Bookmark" />
+      <button class="button--return">Go Back </button>
+    </div>
+  </form>`;
     if (store.adding) {
-      $(".form-container").append(form);
+      $(".form-holder").html(form);
     } else {
       $(".form").remove();
     }
   }
+  function renderError() {
+    $(".error").html(`<h2>Error: ${store.error}</h2>`);
+    setTimeout(() => {
+      store.error = null;
+      render();
+    }, 3000);
+  }
+
   function render() {
     renderForm();
+    if (store.error) {
+      renderError();
+    }
 
-    //render bookmarks
     let bookmarkList = [...store.bookmarks];
     //apply filter
     if (store.minRatingFilter) {
@@ -39,6 +59,7 @@ const bookmarkUtils = (function() {
     const bookmarkListString = bookmarkList.map(generateBookmarkHtml).join("");
     $(".bookmarkList").html(bookmarkListString);
   }
+
   function generateBookmarkHtml(bookmark) {
     let description;
     let link = `<a class="url"  target="_blank" href=${
@@ -49,11 +70,21 @@ const bookmarkUtils = (function() {
     }
     return `
     <li class="js-item-element" data-item-id="${bookmark.id}">
-     <h3>${bookmark.title}</h3>
+    <div class="list-title">
+    <h3>${bookmark.title}</h3>
+    </div>
+     <div class="list-content">
      ${bookmark.extended && description ? description : ""}
      ${bookmark.extended ? link : ""}
-     <p>${bookmark.rating ? bookmark.rating : ""}</p>
-        <button class="js-item-delete">
+     </div>
+     <div class="list-rating">
+     <p>${
+       bookmark.rating
+         ? `Rating: ${bookmark.rating} <i class="fas fa-star"></i>`
+         : ""
+     }</p>
+     </div>
+        <button class="js-item-delete button--item">
           <span class="button-label">delete</span>
         </button>
     </li>`;
@@ -67,16 +98,13 @@ const bookmarkUtils = (function() {
   function handleDeleteItemClicked() {
     $("main").on("click", ".js-item-delete", event => {
       const id = getItemIdFromElement(event.currentTarget);
-      console.log(`clicked ${id}`);
       api
         .deleteBookmark(id)
         .then(() => {
           store.deleteBookmark(id);
           render();
         })
-        .catch(err => {
-          console.log(err);
-        });
+        .catch(err => render());
     });
   }
 
@@ -90,7 +118,13 @@ const bookmarkUtils = (function() {
 
   function handleToggleForm() {
     $(".form-button").click(e => {
-      store.adding = !store.adding;
+      store.toggleAdding();
+      render();
+    });
+  }
+  function handleGoBack() {
+    $(".form-container").on("click", ".button--return", e => {
+      store.toggleAdding();
       render();
     });
   }
@@ -106,11 +140,14 @@ const bookmarkUtils = (function() {
     $(".form-container").on("submit", ".form", e => {
       e.preventDefault();
       const formData = new FormData(e.target);
-      api.addBookmark(fromEntries(formData)).then(data => {
-        store.addBookmark(data);
-        store.adding = false;
-        render();
-      });
+      api
+        .addBookmark(fromEntries(formData))
+        .then(data => {
+          store.addBookmark(data);
+          store.toggleAdding();
+          render();
+        })
+        .catch(err => render());
     });
   }
   function handleFilterChange() {
@@ -125,6 +162,7 @@ const bookmarkUtils = (function() {
     handleNewBookmarkSubmit();
     handleToggleForm();
     handleExtenededClick();
+    handleGoBack();
   }
 
   return {

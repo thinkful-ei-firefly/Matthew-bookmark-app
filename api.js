@@ -12,6 +12,7 @@ const api = (function() {
       .then(data => {
         if (error) {
           error.message = data.message;
+          store.error = error.message;
           return Promise.reject(error);
         }
 

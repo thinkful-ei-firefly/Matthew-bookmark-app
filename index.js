@@ -7,6 +7,6 @@ const main = () => {
       bookmarks.forEach(bookmark => store.addBookmark(bookmark));
       bookmarkUtils.render();
     })
-    .catch(err => console.log(err.message));
+    .catch(err => bookmarkUtils.render());
 };
 $(main);
