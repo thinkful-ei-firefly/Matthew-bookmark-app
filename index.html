@@ -10,10 +10,10 @@
     />
     <script src="https://kit.fontawesome.com/e46679f971.js"></script>
     <link rel="stylesheet" href="main.css" />
-    <title>Document</title>
+    <title>Bookmark Manager Pro</title>
   </head>
   <body>
-    <header class="header">
+    <header class="header" role="banner">
       <h1>Bookmark Manager Pro</h1>
     </header>
     <main class="content-container">
@@ -31,12 +31,12 @@
         </div>
 
         <button class="button form-button">Add Bookmark</button>
-        <div class="form-holder"></div>
+        <div aria-live="polite" class="form-holder"></div>
       </div>
       <div class="bookmark-list-title">
         <h2>Your Bookmarks</h2>
       </div>
-      <ul class="bookmarkList"></ul>
+      <ul class="bookmarkList" aria-live="polite"></ul>
     </main>
   </body>
   <script

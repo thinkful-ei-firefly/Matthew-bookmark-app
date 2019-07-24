@@ -35,6 +35,7 @@ const bookmarkUtils = (function() {
       $(".form").remove();
     }
   }
+  // This function should almost never run it is simply a last resort in case of a server error
   function renderError() {
     $(".error").html(`<h2>Error: ${store.error}</h2>`);
     setTimeout(() => {
@@ -50,6 +51,10 @@ const bookmarkUtils = (function() {
     }
 
     let bookmarkList = [...store.bookmarks];
+
+    if (bookmarkList.length === 0) {
+      return $(".bookmarkList").html(generateEmptyMessage());
+    }
     //apply filter
     if (store.minRatingFilter) {
       bookmarkList = bookmarkList.filter(
@@ -58,6 +63,12 @@ const bookmarkUtils = (function() {
     }
     const bookmarkListString = bookmarkList.map(generateBookmarkHtml).join("");
     $(".bookmarkList").html(bookmarkListString);
+  }
+
+  function generateEmptyMessage() {
+    return `<li class="js-item-element" ">
+    <p>Welcome! You have no current bookmarks saved, click the add bookmark button to get started!</p>
+    </li>`;
   }
 
   function generateBookmarkHtml(bookmark) {
@@ -69,7 +80,9 @@ const bookmarkUtils = (function() {
       description = `<p class="desc">${bookmark.desc}</p>`;
     }
     return `
-    <li class="js-item-element" data-item-id="${bookmark.id}">
+    <li class="js-item-element" tabindex="0" role="button" aria-live="polite" data-item-id="${
+      bookmark.id
+    }">
     <div class="list-title">
     <h3>${bookmark.title}</h3>
     </div>
@@ -80,7 +93,9 @@ const bookmarkUtils = (function() {
      <div class="list-rating">
      <p>${
        bookmark.rating
-         ? `Rating: ${bookmark.rating} <i class="fas fa-star"></i>`
+         ? `Rating: ${
+             bookmark.rating
+           } <i aria-hidden="true" class="fas fa-star"></i>`
          : ""
      }</p>
      </div>
@@ -109,7 +124,7 @@ const bookmarkUtils = (function() {
   }
 
   function handleExtenededClick() {
-    $("main").on("click", ".js-item-element", e => {
+    $("main").on("click keydown", ".js-item-element", e => {
       const id = $(e.currentTarget).data("item-id");
       store.extendBookmark(id);
       render();
